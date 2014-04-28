@@ -41,7 +41,7 @@ The Walk-through series at a glance
 2. *Building Firefox in automation* - harnessing Mozharness
 3. *Setting up and configuring our machines* - becoming the master of Puppet
 4. *Monitoring and nagging when things go wrong* - keeping an eye on our machines with BuildAPI, SlaveAPI, Slave Health, and Nagios
-5. *Integrating the Cloud* - a look at our Cloud Tools
+5. :ref:`Integrating the Cloud` - a look at our Cloud Tools
 6. *Release Process* - explains why we hold the title of 'Release Engineers'
 7. *Handling application updates* - Balrog to the rescue
 8. *Serving your own machines* - loaning and allocating our machines through Selve-serve
@@ -49,7 +49,7 @@ The Walk-through series at a glance
 10. *Where to go from here* - tips on exploring our infrastructure: wikis, bugzilla, mxr, emails, irc, etc
 11. *A look into the future* - what's up and coming: taskcluster, relengAPI, etc
 
-..
+
 
     Template for new pages:
 
