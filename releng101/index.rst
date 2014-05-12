@@ -37,7 +37,10 @@ To get the ball rolling, below are a collection of materials that will help prov
 The Walk-through series at a glance
 -----------------------------------
 
-1. :ref:`Checkin-To-Builds` - a tour through Buildbot
+1. :ref:`Checkin-To-Builds` - a tour through Buildbot (`latest update`__ if your not reading this online.)
+
+__ https://github.com/mozilla/build-relengdocs/commits/master/releng101/checkin-to-builds.rst
+
 2. *Building Firefox in automation* - harnessing Mozharness
 3. *Setting up and configuring our machines* - becoming the master of Puppet
 4. *Monitoring and nagging when things go wrong* - keeping an eye on our machines with BuildAPI, SlaveAPI, Slave Health, and Nagios
@@ -50,12 +53,13 @@ The Walk-through series at a glance
 11. *A look into the future* - what's up and coming: taskcluster, relengAPI, etc
 
 
-
     Template for new pages:
 
     * Software:
-
-    + Mozharness
     * Repos:
-    * Purpose:
+    * Purpose of walk-through:
 
+.. _Release Engineering as a Force Multiplier: https://www.youtube.com/watch?v=7j0NDGJVROI
+.. _Keep Calm and Ship It: https://air.mozilla.org/intern-presentation-zeller/
+.. _Mozilla's cloud and in-house continuous integration: https://air.mozilla.org/problems-and-cutting-costs-for-mozillas-hybrid-ec2-in-house-continuous-integration/
+.. _Planet Releng: http://planet.mozilla.org/releng/

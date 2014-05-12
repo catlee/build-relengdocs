@@ -1,3 +1,5 @@
+.. _software:
+
 Software
 ========
 
@@ -72,18 +74,19 @@ automated systems.
 buildbot schedulers
 -------------------
 Buildbot schedulers are objects that are responsible for creating new
-`build requests`_. Some usual examples of this are creating the requests to
-do builds in response to a developer push, or doing nightly builds on a
-timer.
+:ref:`build requests`. Some usual examples of this are creating the
+requests to do builds in response to a developer push, or doing nightly
+builds on a timer.
 
 Schedulers themselves are run sequentially in a loop on the `buildbot
 master`. They are generally run on a timer, or if a new buildbot change is
 added to the master.
 
-Schedulers that use push information generally look in the `scheduler
-database`_ for new changes since last time the scheduler ran. If there are
-any new changes that are applicable, the scheduler then creates new rows in
-the buildrequests table of the `scheduler database`_.
+Schedulers that use push information generally look in the
+:ref:`scheduler database` for new changes since last time the scheduler
+ran. If there are any new changes that are applicable, the scheduler
+then creates new rows in the buildrequests table of the :ref:`scheduler
+database`.
 
 In addition to the `built-in schedulers`_, RelEng maintains many custom
 buildbot schedulers.
@@ -133,10 +136,24 @@ postrun.py
 ----------
 
 postrun.py is run after most jobs. It is reponsible for creating the text
-log for the job, uploading it to ftp, updating the `status database`_ and
-pushing the final notification events to pulse.
+log for the job, uploading it to ftp, updating the :ref:`status
+database` and pushing the final notification events to pulse.
 
 http://hg.mozilla.org/build/buildbotcustom/file/default/bin/postrun.py
+
+
+Mozharness
+----------
+
+Mozharness is a configuration driven script harness. It provides a set of common tools for writing scripts. These scripts know how to do some general task that is agnostic to specifics: platform or special variants. The scripts get their specific details from a corresponding config.
+
+eg: you could a have a script that is tasked with running a Firefox test suite: a windows 7 mochitest plain1 build
+
+Basescript: Basescript is the core of Mozharness. It defines how scripts are run. Basescript is also responsible for
+self.config. self.config is the config dict that represents a given script run. The logic for populating self.config happens via BaseConfig. BaseConfig will
+conglomerate variables like default_config (a dict that represents some default items that all scripts will use), config files (eg: when you pass --cfg
+config_file.py, we grab the dict from that file), and other command line args (eg: --branch mozilla-central, could do self.config['branch'] = 'mozilla-central')
+
 
 
 .. _TBPL:
