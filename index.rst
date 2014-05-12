@@ -31,6 +31,7 @@ Contents:
     adding_repo_to_releng_rtfd_account.rst
     maintaining_these_docs.rst
     releng101/checkin-to-builds.rst
+    releng101/cloudtools.rst
     tobewritten.rst
 
 

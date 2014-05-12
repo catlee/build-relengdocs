@@ -1,3 +1,5 @@
+.. _Integrating-the-Cloud:
+
 Integrating the Cloud
 ---------------------
 
@@ -7,8 +9,8 @@ Integrating the Cloud
 
 * Repos:
 
-  + http://hg.mozilla.org/build/cloud-tools/
-  + http://hg.mozilla.org/build/puppet
+  + https://hg.mozilla.org/build/cloud-tools/
+  + https://hg.mozilla.org/build/puppet
 
 * Purpose:
 
@@ -80,20 +82,48 @@ aws_watch_pending.py has this basic flow:
         for buildername_exp, moz_instance_type in builder_map.items():
             if re.match(buildername_exp, pending_buildername):
                 slaveset = get_allocated_slaves(pending_buildername)
-                log.debug("%s instance type %s slaveset %s", pending_buildername, moz_instance_type, slaveset)
                 to_create_spot[moz_instance_type, slaveset] += 1
                 break
-        else:
-            log.debug("%s has pending jobs, but no instance types defined",
-                      pending_buildername)
 
     if not to_create_spot and not to_create_ondemand:
-        log.debug("no pending jobs we can do anything about! all done!")
         return
 
+* Now that we have a count of machines per instance type, we apply some
+  heuristics to the count to prevent starting too many machines at once::
+
+    for create_type, d in to_create.iteritems():
+        for (moz_instance_type, slaveset), count in d.iteritems():
+            running = aws_get_running_instances(all_instances, moz_instance_type)
+            running = aws_get_slaveset_instances(running, slaveset)
+            # Filter by create_type
+            if create_type == 'spot':
+                running = aws_get_spot_instances(running)
+            else:
+                running = aws_get_ondemand_instances(running)
+
+            # Get instances launched recently
+            fresh = aws_get_fresh_instances(running, time.time() - FRESH_INSTANCE_DELAY)
+            num_fresh = len(fresh)
+
+            num_old = len(running) - num_fresh
+            delta = num_fresh + (num_old / 10)
+            d[moz_instance_type, slaveset] = max(0, count - delta)
+
+ * Reduce the number of required instances by 1 for every instance we've
+   started recently. This timeout is defined as the FRESH_INSTANCE_DELAY_ and
+   is currently set to 20 minutes. The reasoning here is that a machine can
+   take many minutes to be fulfilled, boot up, run puppet, connect to
+   buildbot, and finally be available to do jobs. Since aws_watch_pending
+   is run every few minutes, we would otherwise be starting up too many
+   instances in response to a single pending jobs.
+
+ * Reduce the number of required instances by 10% of the number of running
+   instances (excluding the "fresh" instances above). The reasoning here is
+   that there is some chance that one of the running machines will complete
+   its jobs and be available to take on more work before a new instance can
+   start up and be available.
 
 
 
 
-
-
+.. _cloud tools: https://hg.mozilla.org/build/cloud-tools/

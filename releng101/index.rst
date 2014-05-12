@@ -44,7 +44,7 @@ __ https://github.com/mozilla/build-relengdocs/commits/master/releng101/checkin-
 2. *Building Firefox in automation* - harnessing Mozharness
 3. *Setting up and configuring our machines* - becoming the master of Puppet
 4. *Monitoring and nagging when things go wrong* - keeping an eye on our machines with BuildAPI, SlaveAPI, Slave Health, and Nagios
-5. :ref:`Integrating the Cloud` - a look at our Cloud Tools
+5. :ref:`Integrating-the-Cloud` - a look at our Cloud Tools
 6. *Release Process* - explains why we hold the title of 'Release Engineers'
 7. *Handling application updates* - Balrog to the rescue
 8. *Serving your own machines* - loaning and allocating our machines through Selve-serve
