@@ -1,3 +1,4 @@
+.. vim: sts=2 tw=75
 .. _Integrating-the-Cloud:
 
 Integrating the Cloud
@@ -29,7 +30,7 @@ aws_manager_ module.
 
 aws_watch_pending.py has this basic flow:
 
-* Look at the set of pending jobs in the `scheduler database`_ via simple
+* Look at the set of pending jobs in the :ref:`scheduler database` via simple
   SQL query::
 
         SELECT buildername, id FROM
@@ -56,7 +57,7 @@ aws_watch_pending.py has this basic flow:
   Here we match various builder names from the pending jobs, and map them
   to the instance types. The builder names are generated as part of
   generateBranchObjects, and the entries in the database have already been
-  added by the `buildbot schedulers`_.
+  added by the :ref:`buildbot schedulers`.
 
   Jobs that have no matching instance type are assumed to be not runnable
   on AWS, and so we ignore them from here on.
@@ -123,7 +124,57 @@ aws_watch_pending.py has this basic flow:
    its jobs and be available to take on more work before a new instance can
    start up and be available.
 
+* At this point we now have our final count of how many machines we want to
+  start. We'll try and start spot instances first. This happens in
+  `request_spot_instances`_. First we get the current spot prices for all
+  the regions and instance types we're interested in::
 
+    spot_choices = get_spot_choices(connections, spot_rules, "Linux/UNIX (Amazon VPC)")
 
+  This returns a sorted list of instance types and regions that match out
+  spot_rules. The logic for this is in bid.py_. ::
+
+    def decide(connections, rules, product_description, start_time=None, instance_type=None):
+        choices = []
+        prices = {}
+        for connection in connections:
+            prices.update(get_current_spot_prices(connection, product_description, start_time, instance_type))
+
+  First we get a list of all the prices we're interested in. ::
+
+        for rule in rules:
+            instance_type = rule["instance_type"]
+            bid_price = rule["bid_price"]
+            performance_constant = rule["performance_constant"]
+            for region, region_prices in prices.iteritems():
+                for az, price in region_prices.get(instance_type, {}).iteritems():
+                    if price > bid_price:
+                        log.debug("%s (in %s) too expensive for %s", price, az,
+                                  instance_type)
+
+  Then we filter out prices that are too expensive. Anything else is a
+  valid possibilty at this point. ::
+
+                    else:
+                        choices.append(
+                            Spot(instance_type=instance_type, region=region,
+                                 availability_zone=az, current_price=price,
+                                 bid_price=bid_price,
+                                 performance_constant=performance_constant))
+
+  The Spot class supports implements its own sorting by overriding
+  ``__cmp__`` method to factor in the price **and** performance constant.
+  This sorting is then used to return the list of potential spot choices in
+  order from cheapest to most expensive. ::
+
+        # sort by self.value
+        choices.sort()
+        return choices
 
 .. _cloud tools: https://hg.mozilla.org/build/cloud-tools/
+.. _aws_watch_pending.py: https://hg.mozilla.org/build/cloud-tools/file/654e3bd00d6c/scripts/aws_watch_pending.py
+.. _aws_manager: https://hg.mozilla.org/build/puppet/file/ae014c57a505/modules/aws_manager
+.. _watch_pending.cfg: https://hg.mozilla.org/build/cloud-tools/file/654e3bd00d6c/configs/watch_pending.cfg
+.. _FRESH_INSTANCE_DELAY: https://hg.mozilla.org/build/cloud-tools/file/654e3bd00d6c/scripts/aws_watch_pending.py#l40
+.. _request_spot_instances: https://hg.mozilla.org/build/cloud-tools/file/654e3bd00d6c/scripts/aws_watch_pending.py#l312
+.. _bid.py: https://hg.mozilla.org/build/cloud-tools/file/654e3bd00d6c/scripts/bid.py
